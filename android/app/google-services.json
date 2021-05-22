@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1052607654046",
+    "project_id": "carpark-f4966",
+    "storage_bucket": "carpark-f4966.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1052607654046:android:2929ed1f2dafb03828b38f",
+        "android_client_info": {
+          "package_name": "com.example.ilkproje"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1052607654046-s5lg447qegedm02uob4he6mfhv1j0ftr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9TkiZPwhkrheiCQkvsfFlq5ODAdVJ1Ns"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1052607654046-s5lg447qegedm02uob4he6mfhv1j0ftr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
