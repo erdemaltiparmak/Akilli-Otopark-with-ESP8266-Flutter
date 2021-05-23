@@ -43,6 +43,13 @@ locatePosition() async {
 }
 
 move() async {
+  CameraPosition cameraPosition =
+      CameraPosition(target: seciliOtopark, zoom: 17);
+  newGoogleMapController
+      .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+}
+
+moveDestination() async {
   CameraPosition cameraPosition = CameraPosition(target: center, zoom: 17);
   newGoogleMapController
       .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
@@ -69,6 +76,7 @@ String otoparkAdi;
 String kapasite;
 String doluluk;
 String uzaklik = "aaaaa";
+LatLng seciliOtopark;
 void _onMapCreated(GoogleMapController controller) {
   mapController.complete(controller);
   newGoogleMapController = controller;
@@ -119,8 +127,8 @@ class _MapScreenState extends State<MapScreen> {
             ]),
             child: FloatingActionButton(
               backgroundColor: Colors.white,
-              onPressed: () {
-                move();
+              onPressed: () async {
+                await moveDestination();
               },
               child: Icon(
                 Icons.my_location,
@@ -294,11 +302,17 @@ class _MapScreenState extends State<MapScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Spacer(flex: 4),
-                                              Text(otoparkAdi,
-                                                  style: TextStyle(
-                                                    fontSize: 17.2,
-                                                    fontWeight: FontWeight.bold,
-                                                  )),
+                                              InkWell(
+                                                onTap: () async {
+                                                  await move();
+                                                },
+                                                child: Text(otoparkAdi,
+                                                    style: TextStyle(
+                                                      fontSize: 17.2,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    )),
+                                              ),
                                               Spacer(flex: 1),
                                               Text(
                                                   "Doluluk:" +
@@ -361,7 +375,7 @@ class _MapScreenState extends State<MapScreen> {
       print("info doldu");
       _info = directions;
     });
-    move();
+    moveDestination();
   }
 
   List<Marker> markers = [];
@@ -374,10 +388,13 @@ class _MapScreenState extends State<MapScreen> {
         infoWindow: InfoWindow(),
         onTap: () {
           setState(() {
+            _info = null;
+
             center = LatLng(d.xCoordinates, d.yCoordinates);
             otoparkAdi = d.name;
             kapasite = d.capacity.toString();
             doluluk = d.emptyParking.toString();
+            seciliOtopark = LatLng(d.xCoordinates, d.yCoordinates);
             _destination = new Marker(
                 markerId: MarkerId('destination'),
                 position: LatLng(d.xCoordinates, d.yCoordinates));
