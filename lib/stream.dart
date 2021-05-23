@@ -26,17 +26,12 @@ class _StreamDemoState extends State<StreamDemo> {
     return StreamBuilder<Object>(
         stream: markersStream(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Center(
-              child: Text(snapshot.data.toString()),
-            );
-          }
-          return FutureBuilder(
+          return FutureBuilder<Object>(
               future: snapshot.data,
               builder: (context, snapshot) {
                 return Scaffold(
                   body: Container(
-                    child: Center(child: Text(snapshot.toString())),
+                    child: Text(snapshot.toString()),
                   ),
                 );
               });
