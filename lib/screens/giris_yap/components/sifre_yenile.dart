@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import '/screens/components/widgets.dart';
 import '../../../constants.dart';
@@ -68,6 +70,7 @@ class SifreYenile extends StatelessWidget {
                   padding: EdgeInsets.all(genisligeGoreAyarla(context, 27)),
                   child: Button(
                     onPressed: () async {
+                      await Firebase.initializeApp();
                       if (await resetPassword(_eMail.text))
                         _showMyDialog(context,
                             "E-mail adresinize parola sıfırlama bağlantısı içeren bir e posta gönderildi.");
@@ -109,10 +112,15 @@ AppBar _appBar(BuildContext context) {
   );
 }
 
+final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
 Future<bool> resetPassword(String email) async {
   try {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
     return true;
-  } catch (e) {}
+  } on FirebaseAuthException catch (e) {
+    print(e.message);
+  }
   return false;
 }
 

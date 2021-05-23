@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "1052607654046",
-    "project_id": "carpark-f4966",
-    "storage_bucket": "carpark-f4966.appspot.com"
+    "project_number": "1045091862711",
+    "project_id": "akilliotopark-9d3a8",
+    "storage_bucket": "akilliotopark-9d3a8.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1052607654046:android:2929ed1f2dafb03828b38f",
+        "mobilesdk_app_id": "1:1045091862711:android:5d9ee37f597a7151ba6532",
         "android_client_info": {
           "package_name": "com.example.ilkproje"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1052607654046-s5lg447qegedm02uob4he6mfhv1j0ftr.apps.googleusercontent.com",
+          "client_id": "1045091862711-f341gmloegctspeouql77dp4bf8lh57o.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB9TkiZPwhkrheiCQkvsfFlq5ODAdVJ1Ns"
+          "current_key": "AIzaSyCguXGwQ-w-Uqk4ozo5V8zh7ZE1Xoa56yE"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "1052607654046-s5lg447qegedm02uob4he6mfhv1j0ftr.apps.googleusercontent.com",
+              "client_id": "1045091862711-f341gmloegctspeouql77dp4bf8lh57o.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

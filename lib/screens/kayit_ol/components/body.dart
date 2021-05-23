@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:ilkproje/screens/components/widgets.dart';
 import 'package:ilkproje/screens/giris_yap/giris_ekrani.dart';
@@ -156,20 +158,21 @@ class _KayitFormuState extends State<KayitFormu> {
                 children: [
                   Button(
                     onPressed: () async {
-                      // await Firebase.initializeApp();
-                      // if(await register(_eMail.text, _password.text, context)) {
-                      //   await FirebaseAuth.instance.signInWithEmailAndPassword(email: _eMail.text, password: _password.text);
+                      await Firebase.initializeApp();
+                      if (await register(
+                          _eMail.text, _password.text, context)) {
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                            email: _eMail.text, password: _password.text);
 
-                      //  await _showMyDialog(context, mesaj:"Kaydınız başarıyla oluşturuldu.\nGiriş Yapabilirsiniz",basariliMi: true);
-                      // }
-                      // else{
-                      //   _showMyDialog(context,mesaj: "Bu e-maile kayıtlı bir hesap zaten var", basariliMi: false) ;
-
-                      // }
-                      await _showMyDialog(context,
-                          mesaj:
-                              "Kaydınız başarıyla oluşturuldu.\nGiriş Yapabilirsiniz",
-                          basariliMi: true);
+                        await _showMyDialog(context,
+                            mesaj:
+                                "Kaydınız başarıyla oluşturuldu.\nGiriş Yapabilirsiniz",
+                            basariliMi: true);
+                      } else {
+                        _showMyDialog(context,
+                            mesaj: "Bu e-maile kayıtlı bir hesap zaten var",
+                            basariliMi: false);
+                      }
                     },
                     title: "Kayıt Ol",
                     buttonColor: kPrimaryColor,
@@ -188,20 +191,19 @@ class _KayitFormuState extends State<KayitFormu> {
 
 Future<bool> register(
     String email, String password, BuildContext context) async {
-  // try {
-  //   await FirebaseAuth.instance
-  //       .createUserWithEmailAndPassword(email: email, password: password);
-  //   return true;
-  // } on FirebaseAuthException catch (e) {
-  //    if (e.code == 'email-already-in-use') {
-  //    //  _showMyDialog(context,mesaj: "Bu e-maile kayıtlı bir hesap zaten var", basariliMi: false) ;
-  //    }
-  //   return false;
-  // } catch (e) {
-  //   print(e.toString());
-  //   return false;
-  // }
-  return true;
+  try {
+    await FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password);
+    return true;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'email-already-in-use') {
+      //  _showMyDialog(context,mesaj: "Bu e-maile kayıtlı bir hesap zaten var", basariliMi: false) ;
+    }
+    return false;
+  } catch (e) {
+    print(e.toString());
+    return false;
+  }
 }
 
 Future<void> _showMyDialog(BuildContext context,

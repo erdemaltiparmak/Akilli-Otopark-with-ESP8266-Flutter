@@ -1,4 +1,6 @@
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
@@ -219,6 +221,8 @@ class _GirisFormuState extends State<GirisFormu> {
                   onPressed: () async {
                     if (_formKey.currentState.validate()) {
                       _formKey.currentState.save();
+                      await Firebase.initializeApp();
+
                       if (await signIn(_eMail.text, _password.text, context)) {
                         if (isChecked == true) {
                           _saveSharedPreferences().then((value) {
@@ -256,20 +260,21 @@ class _GirisFormuState extends State<GirisFormu> {
 }
 
 Future<bool> signIn(String email, String password, BuildContext context) async {
-  // try {
-  //   await FirebaseAuth.instance
-  //       .signInWithEmailAndPassword(email: email, password: password);
-  //   return true;
-  // } on FirebaseAuthException catch (e) {
-  //   if (e.code == 'user-not-found') {
-  //     _showMyDialog(context, "Bu maille bir kullanıcı kaydı bulunamadı.");
-  //   } else if (e.code == 'wrong-password') {
-  //     _showMyDialog(context, "Şifreniz yanlış");
-  //   } else {
-  //     _showMyDialog(context, "Kayıt Bulunamadı");
-  //   }
-  // }
-  return true;
+  await Firebase.initializeApp();
+
+  try {
+    await FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password);
+    return true;
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      _showMyDialog(context, "Bu maille bir kullanıcı kaydı bulunamadı.");
+    } else if (e.code == 'wrong-password') {
+      _showMyDialog(context, "Şifreniz yanlış");
+    } else {
+      _showMyDialog(context, "Kayıt Bulunamadı");
+    }
+  }
 }
 
 Future<String> _saveSharedPreferences() async {
