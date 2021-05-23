@@ -1,12 +1,14 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:ilkproje/directions_repository.dart';
 import 'package:ilkproje/model/directions_model.dart';
+import 'package:ilkproje/screens/giris_yap/giris_ekrani.dart';
+import 'package:ilkproje/screens/splash_screen.dart';
 import 'package:ilkproje/stream.dart';
+import 'package:ilkproje/utils/shared_preferences.dart';
 
 import 'model/marker_model.dart';
 import 'service/marker_service.dart';
@@ -73,7 +75,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Raleway'),
-      home: MapScreen(),
+      home: SplashScreen(),
     );
   }
 }
@@ -156,7 +158,6 @@ class _MapScreenState extends State<MapScreen> {
                   future: snapshot.data,
                   builder: (context, snapshot) {
                     dd = snapshot.data;
-                    debugPrint(dd[0].publicId.toString());
                     return Stack(
                       children: [
                         Positioned.fill(
@@ -377,8 +378,8 @@ class _MapScreenState extends State<MapScreen> {
                                                                 .toString(),
                                                         style: TextStyle(
                                                             fontSize: 17.2,
-                                                            color:
-                                                                Colors.black)),
+                                                            color: Color(
+                                                                0xff01b7c3))),
                                                     Spacer(flex: 8),
                                                   ],
                                                 ),
@@ -415,7 +416,7 @@ class _MapScreenState extends State<MapScreen> {
                                   ],
                                 ),
                               ))
-                            : Container()
+                            : Container(),
                       ],
                     );
                   });
