@@ -55,6 +55,13 @@ moveDestination() async {
       .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 }
 
+moveDestinationWithTilt() async {
+  CameraPosition cameraPosition =
+      CameraPosition(target: center, zoom: 17, tilt: 60);
+  newGoogleMapController
+      .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+}
+
 MarkerService markerService = new MarkerService();
 Future<List<MarkerModel>> markerList;
 
@@ -77,6 +84,7 @@ String kapasite;
 String doluluk;
 String uzaklik = "aaaaa";
 LatLng seciliOtopark;
+String publicId;
 void _onMapCreated(GoogleMapController controller) {
   mapController.complete(controller);
   newGoogleMapController = controller;
@@ -93,6 +101,7 @@ class MapScreen extends StatefulWidget {
 Marker _origin;
 Marker _destination;
 Directions _info;
+List<MarkerModel> dd;
 
 class _MapScreenState extends State<MapScreen> {
   BitmapDescriptor markerIcon;
@@ -138,231 +147,278 @@ class _MapScreenState extends State<MapScreen> {
           ),
         ),
         body: StreamBuilder(
-          stream: Stream.fromFuture(markerService.getMarkers()),
-          builder: (context, AsyncSnapshot<List<MarkerModel>> snapshot) {
-            List<MarkerModel> data;
+          stream: markersStream(),
+          builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return Center(child: CircularProgressIndicator());
             } else {
-              data = snapshot.data;
-              return Stack(
-                children: [
-                  Positioned.fill(
-                    child: FutureBuilder(
-                        future: getCurrentLocation(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(
-                              child:
-                                  CircularProgressIndicator(color: Colors.blue),
-                            );
-                          }
-                          return GoogleMap(
-                            padding: EdgeInsets.only(),
-                            myLocationEnabled: true,
-                            zoomGesturesEnabled: true,
-                            zoomControlsEnabled: true,
-                            onMapCreated: (controller) {
-                              mapController.complete(controller);
-                              newGoogleMapController = controller;
-                              locatePosition();
-                              setState(() {
-                                bottomPad = 300;
-                              });
-                            },
-                            polylines: {
-                              if (_info != null)
-                                Polyline(
-                                    polylineId: PolylineId('polylineid'),
-                                    color: Colors.red,
-                                    width: 5,
-                                    points: _info.polylinePoints
-                                        .map((e) =>
-                                            LatLng(e.latitude, e.longitude))
-                                        .toList())
-                            },
-                            initialCameraPosition: CameraPosition(
-                                target: latlngPosition == null
-                                    ? LatLng(42, 36)
-                                    : center,
-                                zoom: 17),
-                            markers: Set.from(setMarkers(data)),
-                            onTap: (a) {
-                              setState(() {
-                                isTapped = false;
-                                _info = null;
-                              });
-                            },
-                          );
-                        }),
-                  ),
-                  _info != null
-                      ? Positioned(
-                          top: 60,
-                          left: 60,
-                          right: 60,
-                          child: Container(
-                            height: 45,
-                            decoration: BoxDecoration(
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.black45, blurRadius: 10)
-                                ],
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(15)),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Row(
-                                children: [
-                                  Spacer(),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.drive_eta,
-                                        color: Color(0xff01b7c3),
-                                        size: 20,
-                                      ),
-                                      Text(
-                                        _info.totalDistance,
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 21),
-                                      ),
-                                    ],
-                                  ),
-                                  Spacer(),
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.timer_sharp,
-                                        color: Color(0xff01b7c3),
-                                        size: 20,
-                                      ),
-                                      Text(
-                                        _info.totalDuration,
-                                        style: TextStyle(
-                                            color: Colors.black, fontSize: 21),
-                                      ),
-                                    ],
-                                  ),
-                                  Spacer(),
-                                ],
-                              ),
-                            ),
-                          ))
-                      : Container(),
-                  isTapped
-                      ? Positioned(
-                          child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.18,
-                                margin: EdgeInsets.only(
-                                    left: 20,
-                                    right: 20,
-                                    bottom: MediaQuery.of(context).size.height /
-                                        25),
-                                decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    boxShadow: <BoxShadow>[
-                                      BoxShadow(
-                                          color: Colors.black54,
-                                          blurRadius: 10),
-                                    ],
-                                    borderRadius: BorderRadius.circular(20)),
+              return FutureBuilder<Object>(
+                  future: snapshot.data,
+                  builder: (context, snapshot) {
+                    dd = snapshot.data;
+                    debugPrint(dd[0].publicId.toString());
+                    return Stack(
+                      children: [
+                        Positioned.fill(
+                          child: FutureBuilder(
+                              future: getCurrentLocation(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                        color: Colors.blue),
+                                  );
+                                }
+                                return GoogleMap(
+                                  mapType: MapType.normal,
+                                  padding: EdgeInsets.only(),
+                                  myLocationEnabled: true,
+                                  zoomGesturesEnabled: true,
+                                  zoomControlsEnabled: true,
+                                  onMapCreated: (controller) {
+                                    mapController.complete(controller);
+                                    newGoogleMapController = controller;
+                                    locatePosition();
+                                    setState(() {
+                                      bottomPad = 300;
+                                    });
+                                  },
+                                  polylines: {
+                                    if (_info != null)
+                                      Polyline(
+                                          polylineId: PolylineId('polylineid'),
+                                          color: Colors.red,
+                                          width: 5,
+                                          points: _info.polylinePoints
+                                              .map((e) => LatLng(
+                                                  e.latitude, e.longitude))
+                                              .toList())
+                                  },
+                                  initialCameraPosition: CameraPosition(
+                                      target: latlngPosition == null
+                                          ? LatLng(42, 36)
+                                          : center,
+                                      zoom: 17),
+                                  markers: Set.from(setMarkers(dd)),
+                                  onTap: (a) {
+                                    setState(() {
+                                      isTapped = false;
+                                      _info = null;
+                                    });
+                                  },
+                                );
+                              }),
+                        ),
+                        _info != null
+                            ? Positioned(
+                                top: 60,
+                                left: 60,
+                                right: 60,
                                 child: Container(
-                                  child: Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 8.0, right: 8),
-                                        child: Expanded(
-                                          flex: 2,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              CircleAvatar(
-                                                  radius: 50,
-                                                  backgroundImage: AssetImage(
-                                                      "assets/images/otopark.jpg"))
-                                            ],
-                                          ),
+                                  height: 45,
+                                  decoration: BoxDecoration(
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: Colors.black45,
+                                            blurRadius: 10)
+                                      ],
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    child: Row(
+                                      children: [
+                                        Spacer(),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.drive_eta,
+                                              color: Color(0xff01b7c3),
+                                              size: 20,
+                                            ),
+                                            Text(
+                                              _info.totalDistance,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 21),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      Expanded(
-                                        flex: 3,
-                                        child: Container(
-                                          padding: EdgeInsets.only(left: 8),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Spacer(flex: 4),
-                                              InkWell(
-                                                onTap: () async {
-                                                  await move();
-                                                },
-                                                child: Text(otoparkAdi,
-                                                    style: TextStyle(
-                                                      fontSize: 17.2,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    )),
-                                              ),
-                                              Spacer(flex: 1),
-                                              Text(
-                                                  "Doluluk:" +
-                                                      doluluk +
-                                                      "/" +
-                                                      kapasite,
-                                                  style: TextStyle(
-                                                    fontSize: 17.2,
-                                                  )),
-                                              Text("otoparkUzaklik",
-                                                  style: TextStyle(
-                                                      fontSize: 17.2,
-                                                      color:
-                                                          Color(0xff01b7c3))),
-                                              Spacer(flex: 8),
-                                            ],
-                                          ),
+                                        Spacer(),
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.timer_sharp,
+                                              color: Color(0xff01b7c3),
+                                              size: 20,
+                                            ),
+                                            Text(
+                                              _info.totalDuration,
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 21),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      Expanded(
-                                          flex: 2,
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.stretch,
-                                            children: [
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                    top: 24.0, left: 12),
-                                                child: IconButton(
-                                                    onPressed: getDirections,
-                                                    icon: Icon(
-                                                      Icons.directions,
-                                                      color: Color(0xff01b7c3),
-                                                      size: 52,
-                                                    )),
-                                              )
-                                            ],
-                                          ))
-                                    ],
+                                        Spacer(),
+                                      ],
+                                    ),
                                   ),
+                                ))
+                            : Container(),
+                        isTapped
+                            ? Positioned(
+                                child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.18,
+                                      margin: EdgeInsets.only(
+                                          left: 20,
+                                          right: 20,
+                                          bottom: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              25),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: <BoxShadow>[
+                                            BoxShadow(
+                                                color: Colors.black54,
+                                                blurRadius: 10),
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                      child: Container(
+                                        child: Row(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 8.0, right: 8),
+                                              child: Expanded(
+                                                flex: 2,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    CircleAvatar(
+                                                        radius: 50,
+                                                        backgroundImage: AssetImage(
+                                                            "assets/images/otopark.jpg"))
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                padding:
+                                                    EdgeInsets.only(left: 8),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Spacer(flex: 4),
+                                                    InkWell(
+                                                      onTap: () async {
+                                                        await move();
+                                                      },
+                                                      child: Text(
+                                                          dd
+                                                              .singleWhere(
+                                                                  (element) =>
+                                                                      element
+                                                                          .publicId ==
+                                                                      publicId)
+                                                              .name
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            fontSize: 17.2,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          )),
+                                                    ),
+                                                    Spacer(flex: 1),
+                                                    Text(
+                                                        "Doluluk:" +
+                                                            dd
+                                                                .singleWhere(
+                                                                    (element) =>
+                                                                        element
+                                                                            .publicId ==
+                                                                        publicId)
+                                                                .emptyParking
+                                                                .toString() +
+                                                            "/" +
+                                                            dd
+                                                                .singleWhere(
+                                                                    (element) =>
+                                                                        element
+                                                                            .publicId ==
+                                                                        publicId)
+                                                                .capacity
+                                                                .toString(),
+                                                        style: TextStyle(
+                                                          fontSize: 17.2,
+                                                        )),
+                                                    Text(
+                                                        "Kat Sayısı:" +
+                                                            dd
+                                                                .singleWhere(
+                                                                    (element) =>
+                                                                        element
+                                                                            .publicId ==
+                                                                        publicId)
+                                                                .sumFloor
+                                                                .toString(),
+                                                        style: TextStyle(
+                                                            fontSize: 17.2,
+                                                            color:
+                                                                Colors.black)),
+                                                    Spacer(flex: 8),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(
+                                                flex: 2,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .stretch,
+                                                  children: [
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 24.0, left: 12),
+                                                      child: IconButton(
+                                                          onPressed:
+                                                              getDirections,
+                                                          icon: Icon(
+                                                            Icons.directions,
+                                                            color: Color(
+                                                                0xff01b7c3),
+                                                            size: 52,
+                                                          )),
+                                                    )
+                                                  ],
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                        ))
-                      : Container()
-                ],
-              );
+                              ))
+                            : Container()
+                      ],
+                    );
+                  });
             }
           },
         ));
@@ -375,7 +431,7 @@ class _MapScreenState extends State<MapScreen> {
       print("info doldu");
       _info = directions;
     });
-    moveDestination();
+    moveDestinationWithTilt();
   }
 
   List<Marker> markers = [];
@@ -389,21 +445,44 @@ class _MapScreenState extends State<MapScreen> {
         onTap: () {
           setState(() {
             _info = null;
-
             center = LatLng(d.xCoordinates, d.yCoordinates);
             otoparkAdi = d.name;
             kapasite = d.capacity.toString();
             doluluk = d.emptyParking.toString();
             seciliOtopark = LatLng(d.xCoordinates, d.yCoordinates);
+            publicId = d.publicId;
             _destination = new Marker(
                 markerId: MarkerId('destination'),
                 position: LatLng(d.xCoordinates, d.yCoordinates));
 
             isTapped = true;
+            setInfo(d);
             move();
           });
           print(d.name);
         })));
+
     return markers;
+  }
+
+  setInfo(MarkerModel d) {
+    setState(() {
+      print(dd[0].toString());
+      otoparkAdi = d.name;
+      kapasite = d.capacity.toString();
+      doluluk = d.emptyParking.toString();
+    });
+  }
+
+  markersStream() async* {
+    while (true) {
+      await Future.delayed(Duration(seconds: 3));
+      print("------------------------");
+      print("girdi");
+      print("-----------------------");
+      yield markerService.getMarkers();
+      /*Future<List<MarkerModel>> markerList = markerService.getMarkers();
+    yield markerList;*/
+    }
   }
 }

@@ -29,9 +29,10 @@ class _StreamDemoState extends State<StreamDemo> {
           return FutureBuilder<Object>(
               future: snapshot.data,
               builder: (context, snapshot) {
+                var dd = snapshot.data as List<MarkerModel>;
                 return Scaffold(
                   body: Container(
-                    child: Text(snapshot.toString()),
+                    child: Center(child: Text(dd[0].name)),
                   ),
                 );
               });
@@ -39,10 +40,14 @@ class _StreamDemoState extends State<StreamDemo> {
   }
 }
 
-Stream<Future<List<MarkerModel>>> markersStream() async* {
+markersStream() async* {
   while (true) {
-    await Future.delayed(Duration(milliseconds: 500));
-    Future<List<MarkerModel>> markerList = markerService.getMarkers();
-    yield markerList;
+    await Future.delayed(Duration(seconds: 3));
+    print("------------------------");
+    print("girdi");
+    print("-----------------------");
+    yield markerService.getMarkers();
+    /*Future<List<MarkerModel>> markerList = markerService.getMarkers();
+    yield markerList;*/
   }
 }
